@@ -1,13 +1,23 @@
-name: release-please
+name: Build & Publish Release APK
 
 on:
   push:
-    branches:
-      - "master"
+    tags:
+      - '*'
 
 jobs:
-  release:
+  Gradle:
     runs-on: ubuntu-latest
-    outputs:
-      tag_name: ${{ steps.release.outputs.tag_name }}
-      release_created: ${{ steps.release.outputs.release_created }}
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+      - name: setup jdk
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+      - name: Releasing using Hub
+        uses: sangatdesai/release-apk@main
