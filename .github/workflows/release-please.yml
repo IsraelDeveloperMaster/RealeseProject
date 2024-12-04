@@ -1,9 +1,9 @@
-#on:
-#  push:
-#    tags:
-#      - "v*"
+on:
+  push:
+    tags:
+      - "v*"
 
-on: create
+#on: create
 
 name: Release
 jobs:
