@@ -3,8 +3,7 @@ name: release-please
 on:
   push:
     branches:
-      - "main"
-      - "release/*"
+      - "master"
 
 jobs:
   release:
