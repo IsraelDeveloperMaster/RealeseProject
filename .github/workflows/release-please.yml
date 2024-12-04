@@ -1,53 +1,33 @@
+name: Create Release Branch
+
 on:
-  push:
-    branches:
-      - master
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-
-name: Add release tag
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Version no of release'
+        required: true
 
 jobs:
-  tag:
-    name: Add release tag
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
-    if: github.event.pull_request.merged == true && github.event.pull_request.head.user.id == github.event.pull_request.base.user.id && startsWith(github.head_ref, 'release/')
+
     steps:
-      - uses: technote-space/load-config-action@v1
-        with:
-          CONFIG_FILENAME: workflow-settings.json, workflow-details.json
-          IGNORE_WARNING: 'true'
-      - name: Get version
-        uses: technote-space/get-next-version-action@v1
-        with:
-          EXCLUDE_MESSAGES: ${{ env.EXCLUDE_MESSAGES }}
-        if: "! startsWith(github.head_ref, 'release/v')"
-      - name: Get version
-        run: echo "NEXT_VERSION=${HEAD_REF#release/}" >> $GITHUB_ENV
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Create Release Branch
+        run: |
+          git checkout -b release/release-${{inputs.release_version}}
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          sed -ie 's/versionName .*/versionName ${{inputs.release_version}}/' app/config.gradle         
+          git commit -m "Automated commit by GitHub Actions to update version name" -a
+          git push --set-upstream origin release/release-${{inputs.release_version}}
+
+      - name: Create Pull Request
         env:
-          HEAD_REF: ${{ github.head_ref }}
-        if: startsWith(github.head_ref, 'release/v')
-      - uses: actions/github-script@v3
-        with:
-          github-token: ${{ secrets.ACCESS_TOKEN }}
-          script: |
-            github.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: `refs/tags/${process.env.NEXT_VERSION}`,
-              sha: context.sha
-            })
-        if: env.NEXT_VERSION
-      - uses: actions/github-script@v3
-        with:
-          github-token: ${{ secrets.ACCESS_TOKEN }}
-          script: |
-            github.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: `refs/heads/release/next-${process.env.NEXT_VERSION}`,
-              sha: context.sha
-            })
-        if: env.NEXT_VERSION
+          GITHUB_TOKEN: ${{ secrets.TOKEN_FOR_PR }}
+        run: |
+          env
+          gh auth login --with-token || echo 0
+          gh pr create -H release/release-${{inputs.release_version}} -B main --title 'Merge release branch into main' --body 'Created by Github action
