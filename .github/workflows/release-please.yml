@@ -1,50 +1,45 @@
-name: 'Release Please'
+name: release-please
 
 on:
   push:
     branches:
-      - master
-
-permissions:
-  contents: write
-  pull-requests: write
+      - "main"
+      - "release/*"
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    outputs:
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      release_created: ${{ steps.release.outputs.release_created }}
     steps:
-      - uses: googleapis/release-please-action@v4
+      - uses: google-github-actions/release-please-action@v4
         id: release
         with:
-          release-type: node
-      - name: Checkout 🛬
-        if: ${{ steps.release.outputs.release_created }}
+          token: ${{ github.token }}
+  
+  upload-artifact:
+    runs-on: ubuntu-latest
+    needs: release
+    if: ${{ needs.release.outputs.release_created }}
+
+    steps:
+      - name: Checkout
         uses: actions/checkout@v4
-      - name: Tag major and minor versions 🏷
-        if: ${{ steps.release.outputs.release_created }}
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git remote add gh-token "https://${{ secrets.GITHUB_TOKEN }}@github.com/googleapis/release-please-action.git"
-          git tag -d v${{ steps.release.outputs.major }} || true
-          git tag -d v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
-          git push origin :v${{ steps.release.outputs.major }} || true
-          git push origin :v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
-          git tag -a v${{ steps.release.outputs.major }} -m "Release v${{ steps.release.outputs.major }}"
-          git tag -a v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} -m "Release v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}"
-          git push origin v${{ steps.release.outputs.major }}
-          git push origin v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}
-      - name: Setup node ⚙️
-        if: ${{ steps.release.outputs.release_created }}
-        uses: actions/setup-node@v4
+        # these if statements ensure that a publication only occurs when
+        # a new release is created:
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
         with:
-          node-version: 20
-          registry-url: 'https://registry.npmjs.org'
-      - name: Install dependencies 📦
-        if: ${{ steps.release.outputs.release_created }}
-        run: npm ci
-      - name: Publish to NPM 🚀
-        if: ${{ steps.release.outputs.release_created }}
-        run: npm publish
+          java-version: "21"
+          distribution: "adopt"
+
+      - name: Create Connector Jar
+        run: ./gradlew shadowJar
+
+      - name: Upload Release Artifact
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |    
+          gh release upload ${{ needs.release.outputs.tag_name }}  build/libs/*.jar --clobber
