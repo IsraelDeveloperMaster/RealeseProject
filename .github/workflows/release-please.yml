@@ -1,34 +1,43 @@
-name: Create Release Branch
+name: Android Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      release_version:
-        description: 'Version no of release'
-        required: true
+  push:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-
     steps:
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Create Release Branch
-        run: |
-          git checkout -b release/release-${{inputs.release_version}}
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          sed -ie 's/versionName .*/versionName ${{inputs.release_version}}/' app/config.gradle         
-          git commit -m "Automated commit by GitHub Actions to update version name" -a
-          git push --set-upstream origin release/release-${{inputs.release_version}}
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: 11
 
-      - name: Create Pull Request
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Sign APK
         env:
-          GITHUB_TOKEN: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
+          KEYSTORE_PATH: ${{ secrets.KEYSTORE_PATH }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          env
-          gh auth login --with-token || echo 0
-          gh pr create -H release/release-${{inputs.release_version}} -B main --title 'Merge release branch into main' --body 'Created by Github action
+          ./gradlew assembleRelease
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore $KEYSTORE_PATH app/build/outputs/apk/release/app-release-unsigned.apk $KEY_ALIAS
+          zipalign -v 4 app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/app-release.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-release.apk
+          path: app/build/outputs/apk/release/app-release.apk
