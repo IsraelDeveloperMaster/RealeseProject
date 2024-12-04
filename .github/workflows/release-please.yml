@@ -1,23 +1,10 @@
-name: Android CI
-
-on:
-  push: # quando de um push executa esse script
-    branches: [ "master" ] # branch master
-
 jobs:
-  build:
-    runs-on: ubuntu-latest # versao da maquina virtual
+  release-job:
+    runs-on: ubuntu-latest
 
-    steps: # passo
-      - uses: actions/checkout@v4
-      - name: set up JDK 11
-        uses: actions/setup-java@v4
-        with:
-          java-version: '11'
-          distribution: 'temurin'
-          cache: gradle
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Build with Gradle
-        run: ./gradlew build
+      - name: Release with release-please
+        uses: google-github-actions/release-please-action@v2
