@@ -1,19 +1,14 @@
-name: Release Workflow
+#on:
+#  push:
+#    tags:
+#      - "v*"
 
-on:
-  push:
-    branches:
-      - 'master'
+on: create
 
+name: Release
 jobs:
-  release-job:
+  release:
+    name: Release GitHub Actions
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      - name: Release with release-please
-        uses: google-github-actions/release-please-action@v2
-        with:
-          token: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
+      - uses: technote-space/release-github-actions@v6
