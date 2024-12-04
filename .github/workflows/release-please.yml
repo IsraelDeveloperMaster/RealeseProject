@@ -1,9 +1,8 @@
-name: Build & Publish Release APK
+name: Android CI
 
 on:
-  push:
-    tags:
-      - '*'
+  push: # quando de um push executa esse script
+    branches: [ "master" ] # branch master
 
 jobs:
   Gradle:
