@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/IsraelDeveloperMaster/RealeseProject/compare/v1.2.0...v1.2.1) (2024-12-05)
+
+
+### Bug Fixes
+
+* release 1.1.1 ([4c466d1](https://github.com/IsraelDeveloperMaster/RealeseProject/commit/4c466d1a2f56083c64edcf221a3417a0a6268343))
+
 ## [1.2.0](https://github.com/IsraelDeveloperMaster/RealeseProject/compare/v1.1.2...v1.2.0) (2024-12-05)
 
 
