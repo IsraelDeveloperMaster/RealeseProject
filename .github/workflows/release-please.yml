@@ -17,10 +17,10 @@ jobs:
         with:
           release-type: simple
       - name: Checkout 🛬
-        if: ${{ steps.release.outputs.release_created }}
+#        if: ${{ steps.release.outputs.release_created }}
         uses: actions/checkout@v4
       - name: Tag major and minor versions 🏷
-        if: ${{ steps.release.outputs.release_created }}
+#        if: ${{ steps.release.outputs.release_created }}
         run: |
                 git config user.name github-actions[bot]
                 git config user.email 41898282+github-actions[bot]@users.noreply.github.com
