@@ -16,6 +16,9 @@ jobs:
         id: release
         with:
           release-type: simple
+      - name: Checkout 🛬
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/checkout@v4
 #           - uses: actions/checkout@v4
 #           - name: tag major and minor versions
 #          command: manifest
