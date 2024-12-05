@@ -16,12 +16,10 @@ jobs:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
-#          release-type: simple
+          release-type: simple
       - name: Checkout 🛬
-        if: ${{ steps.release.outputs.release_created }}
         uses: actions/checkout@v4
       - name: Tag major and minor versions 🏷
-        if: ${{ steps.release.outputs.release_created }}
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
@@ -35,16 +33,13 @@ jobs:
           git push origin v${{ steps.release.outputs.major }}
           git push origin v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}
       - name: Setup node ⚙️
-        if: ${{ steps.release.outputs.release_created }}
         uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
       - name: Install dependencies 📦
-        if: ${{ steps.release.outputs.release_created }}
         run: npm ci
       - name: Publish to NPM 🚀
-        if: ${{ steps.release.outputs.release_created }}
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
