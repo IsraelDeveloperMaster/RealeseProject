@@ -1,45 +1,50 @@
+name: 'Release Please'
+
 on:
   push:
     branches:
-      - master
+      - main
 
 permissions:
   contents: write
   pull-requests: write
 
-name: Run Release Please
 jobs:
-  release-please:
+  release:
     runs-on: ubuntu-latest
     steps:
-      - uses: googleapis/release-please-action@v2
+      - uses: googleapis/release-please-action@v4
         id: release
         with:
-          command: manifest
-#          token: ${{secrets.GITHUB_TOKEN}}
-          default-branch: master
-
-      # The logic below handles the npm publication:
-      - name: Checkout Repository
-        if: ${{ steps.release.outputs.releases_created }}
-        uses: actions/checkout@v2
-      - name: Setup Node
-        uses: actions/setup-node@v1
-        if: ${{ steps.release.outputs.releases_created }}
-        with:
-          node-version: 14
-          registry-url: 'https://registry.npmjs.org'
-      - name: Build Packages
-        if: ${{ steps.release.outputs.releases_created }}
+          release-type: node
+      - name: Checkout 🛬
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/checkout@v4
+      - name: Tag major and minor versions 🏷
+        if: ${{ steps.release.outputs.release_created }}
         run: |
-          npm install
-          npx lerna bootstrap
-
-      # Release Please has already incremented versions and published tags, so we just
-      # need to publish all unpublished versions to NPM here
-      # See: https://github.com/lerna/lerna/tree/main/commands/publish#bump-from-package
-      - name: Publish to NPM
-        if: ${{ steps.release.outputs.releases_created }}
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git remote add gh-token "https://${{ secrets.SENHA_GITHUB_2 }}@github.com/googleapis/release-please-action.git"
+          git tag -d v${{ steps.release.outputs.major }} || true
+          git tag -d v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
+          git push origin :v${{ steps.release.outputs.major }} || true
+          git push origin :v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
+          git tag -a v${{ steps.release.outputs.major }} -m "Release v${{ steps.release.outputs.major }}"
+          git tag -a v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} -m "Release v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}"
+          git push origin v${{ steps.release.outputs.major }}
+          git push origin v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}
+      - name: Setup node ⚙️
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install dependencies 📦
+        if: ${{ steps.release.outputs.release_created }}
+        run: npm ci
+      - name: Publish to NPM 🚀
+        if: ${{ steps.release.outputs.release_created }}
+        run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-        run: npx lerna publish from-package --no-push --no-private --yes
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
