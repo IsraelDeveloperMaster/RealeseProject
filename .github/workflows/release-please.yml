@@ -16,7 +16,7 @@ jobs:
         id: release
         with:
           command: manifest
-          token: ${{secrets.SENHA_GITHUB}}
+          token: ${{secrets.SENHA_GITHUB_2}}
           default-branch: master
                           
                           - 
