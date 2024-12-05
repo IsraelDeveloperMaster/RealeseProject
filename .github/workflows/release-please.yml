@@ -18,6 +18,6 @@ jobs:
           release-type: simple
            - uses: actions/checkout@v4
            - name: tag major and minor versions
-#          command: manifest
-#          token: ${{secrets.SENHA_GITHUB_2}}
-#          default-branch: master
+          command: manifest
+          token: ${{secrets.SENHA_GITHUB_2}}
+          default-branch: master
