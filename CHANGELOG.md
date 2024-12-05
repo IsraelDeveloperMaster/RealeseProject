@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/IsraelDeveloperMaster/RealeseProject/compare/v1.1.2...v1.2.0) (2024-12-05)
+
+
+### Features
+
+* Update release workflow ([e6bb824](https://github.com/IsraelDeveloperMaster/RealeseProject/commit/e6bb82401e7cf2b18d76fb2f5a021befa14099d3))
+
 ### [1.1.2](https://www.github.com/IsraelDeveloperMaster/RealeseProject/compare/v1.1.1...v1.1.2) (2024-12-05)
 
 
