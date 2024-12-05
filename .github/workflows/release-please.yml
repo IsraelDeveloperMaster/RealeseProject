@@ -16,7 +16,7 @@ jobs:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
-          release-type: node
+          release-type: simple
       - name: Checkout 🛬
         if: ${{ steps.release.outputs.release_created }}
         uses: actions/checkout@v4
