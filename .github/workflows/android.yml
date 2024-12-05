@@ -6,7 +6,7 @@ on:
 
 jobs:
   lint:
-    name: Android check
+    name: Spotless check
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -17,7 +17,7 @@ jobs:
           distribution: adopt
           java-version: 17
       - name: spotless
-        run: ./gradlew AndroiCheck
+        run: ./gradlew spotlessCheck
 
   build:
     runs-on: ubuntu-latest
