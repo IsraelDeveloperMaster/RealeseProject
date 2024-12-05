@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - realease
+      - master
 
 permissions:
   contents: write
