@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/IsraelDeveloperMaster/RealeseProject/compare/v1.2.1...v1.2.2) (2024-12-05)
+
+
+### Bug Fixes
+
+* Remove release-please-config.json ([a231a23](https://github.com/IsraelDeveloperMaster/RealeseProject/commit/a231a2330379dada454a207ea8635182b5b7ae47))
+
 ## [1.2.1](https://github.com/IsraelDeveloperMaster/RealeseProject/compare/v1.2.0...v1.2.1) (2024-12-05)
 
 
