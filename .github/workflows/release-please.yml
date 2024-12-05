@@ -15,9 +15,9 @@ jobs:
       - uses: googleapis/release-please-action@v2
         id: release
         with:
-          command: manifest
-          token: ${{secrets.SENHA_GITHUB_2}}
-          default-branch: master
-                          
-                          - 
-                          -
+          release-type: simple
+           - uses: actions/checkout@v4
+           - name: tag major and minor versions
+#          command: manifest
+#          token: ${{secrets.SENHA_GITHUB_2}}
+#          default-branch: master
