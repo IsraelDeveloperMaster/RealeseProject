@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/IsraelDeveloperMaster/RealeseProject/compare/v1.2.2...v1.3.0) (2024-12-09)
+
+
+### Features
+
+* Add CI workflow for Android ([4a427ef](https://github.com/IsraelDeveloperMaster/RealeseProject/commit/4a427ef645b1cfe7f17412dca65f75f9cc1e9015))
+
 ## [1.2.2](https://github.com/IsraelDeveloperMaster/RealeseProject/compare/v1.2.1...v1.2.2) (2024-12-05)
 
 
